@@ -1,7 +1,7 @@
 haproxy-webctl
 ==============
-HAProxy Web Controller
-Control HAProxy with no stopping current service.
+HAProxy Web Controller.
+This script can control HAProxy with no stopping of current service.
 
 
 Author

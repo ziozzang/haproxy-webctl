@@ -46,11 +46,14 @@ SOCK = '/var/run/haproxy/haproxy.sock'
 ALLOWED_IP_BLOCK = ['192.168.0.0/16', "127.0.0.1/32"]
 
 # Do Argument Parsing
-opts, args = getopt.getopt(sys.argv[1:],"s:",["socket="])
-for opt, arg in opts:
-  if opt in ("-s", "--socket"):
-    #print "Set UNIX Socket to '%s'" % arg
-    SOCK = arg
+if __name__ == '__main__':
+  opts, args = getopt.getopt(sys.argv[1:],"s:p:",["socket=","port="])
+  for opt, arg in opts:
+    if opt in ("-s", "--socket"):
+      #print "Set UNIX Socket to '%s'" % arg
+      SOCK = arg
+    elif opt in ("-p", "--port"):
+      LISTEN_PORT = int(arg)
 
 # Set Default HAproxy Execution.
 def exec_haproxyctl(cmd, backend = "", server = ""):
@@ -153,4 +156,5 @@ def no_page(e):
   # anti-hacking policy
   return Response(status=403)
 
-app.run(debug=DEBUG_FLAG, host='0.0.0.0', port=LISTEN_PORT)
+if __name__ == '__main__':
+  app.run(debug=DEBUG_FLAG, host='0.0.0.0', port=LISTEN_PORT)

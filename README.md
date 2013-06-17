@@ -101,3 +101,17 @@ curl http://1.2.3.4:7777/disable/backend_name/server_name
 ```
 
 this can only do request, doesn't show status of backend or server.
+
+
+Known Issue
+===========
+
+if configuration has no backend, only existed listen block, use listen block name insted of backend_name.
+in this example, you can use use "bas" as backend_name.
+
+```
+listen bas
+  bind *:80
+  server vm01 192.168.0.152:80 maxconn 5000 check inter 500ms
+  server vm02 192.168.0.153:80  maxconn 5000 check backup inter 500ms
+```

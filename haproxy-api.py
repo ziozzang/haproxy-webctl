@@ -62,9 +62,14 @@ def exec_haproxyctl(cmd, backend = "", server = ""):
                 '-k', SOCK, '-c', cmd
              ]
   if len(backend) > 0:
-    execinfo += ['-b', re.escape(backend)]
+    # Anti-Injection.
+    escaped = re.escape(backend)
+    escaped = string.replace(escaped, "\\-", "-")
+    execinfo += ['-b', escaped]
   if len(server) > 0:
-    execinfo += ['-s', re.escape(server)]
+    escaped = re.escape(server)
+    escaped = string.replace(escaped, "\\-", "-")
+    execinfo += ['-s', escaped]
   proc = subprocess.check_output(execinfo)
 
   return proc

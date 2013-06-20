@@ -44,7 +44,21 @@ app = Flask(__name__)
 DEBUG_FLAG = True
 LISTEN_PORT = 7777
 SOCK = '/var/run/haproxy/haproxy.sock'
-ALLOWED_IP_BLOCK = ['192.168.0.0/16', "127.0.0.1/32"]
+ALLOWED_IP_BLOCK = ["127.0.0.1/32"]
+CONF_FILE = "/etc/haproxy-api/conf.py"
+
+# Read from /etc/haproxy-api/conf.py
+try:
+  cfg = open(CONF_FILE).read()
+except:
+  print "no configuration file found: %s" % CONF_FILE
+  cfg = None
+
+if cfg is Not None:
+  try:
+    exec(cfg)
+  except e:
+    print "Configuration Import Error..."
 
 # Do Argument Parsing
 if __name__ == '__main__':

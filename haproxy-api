@@ -1,0 +1,77 @@
+#!/bin/bash
+#########################################################
+# HAProxy API init.d script
+# - code by Jioh L. Jung (ziozzang@gmail.com)
+
+execpath="/root/haproxy-api"
+execfile="haproxy-api.py"
+servicename="haproxy-api"
+
+
+# Need root permission
+if [ `whoami` != root ]; then
+  echo Please run this script as root or using sudo
+  exit 1
+fi
+
+# Functions..
+function usage() {
+  echo "Usage: $0 <start|stop|restart>"
+  exit 1;
+}
+
+function start() {
+  if [ -e $2 ]; then
+    # Check Current Process
+    proccnt=`ps ax | grep "${execpath}" | grep "perl" | wc -l`
+    if [ $proccnt -gt 0 ]; then
+      echo "Already running!"
+      exit 0;
+    else
+      echo "Purge Old Session..."
+      rm $2
+    fi
+  fi
+
+  echo "Starting ($1)..."
+  echo $1 > $2
+}
+
+function stop_only() {
+  if [ -f "$1" ]; then
+    pgid=`cat $1`
+    if [ -z $pgid ]; then
+      echo "no active pid."
+    else
+      echo "Stopping (${pgid})..."
+      kill -TERM -${pgid}
+      rm $1
+    fi
+  fi
+}
+
+cmd=$1
+
+program_output="/var/log/${servicename}.log"
+
+pgid=`cat /proc/self/stat | awk '{ print $5 }'`
+pgid_file="/tmp/${servicename}.pgid"
+
+if [ "$cmd" == "stop" ]; then
+  stop_only "$pgid_file"
+  exit 0
+elif [ "$cmd" == "restart" ]; then
+  stop_only "$pgid_file"
+  # Restart is tricky action.
+  # Start process another session...
+  $0 "start"
+  exit 0
+elif [ "$cmd" != "start" ]; then
+  usage
+  exit 1
+fi
+
+cd ${execpath}
+start "$pgid" "$pgid_file"
+
+$execpath/$execfile >> ${program_output} 2>&1 &

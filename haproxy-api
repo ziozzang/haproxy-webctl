@@ -3,7 +3,7 @@
 # HAProxy API init.d script
 # - code by Jioh L. Jung (ziozzang@gmail.com)
 
-execpath="/root/haproxy-api"
+execpath="/root/haproxy-webctl"
 execfile="haproxy-api.py"
 servicename="haproxy-api"
 

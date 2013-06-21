@@ -1,0 +1,28 @@
+#!/bin/bash
+
+[[ "$(id -u)" -eq 0 ]] || (echo "FATAL: Root privilege is required."; exit 1)
+
+apt-get install -fy hatop git-core build-essential python-pip
+pip install flask netaddr
+
+mkdir /var/run/haproxy
+mkdir /etc/haproxy-api
+
+cd ~
+git clone git://github.com/neurogeek/haproxyctl.git
+cd haproxyctl/
+python setup.py install
+
+cd ~
+git clone git://github.com/ziozzang/haproxy-webctl.git
+
+cp haproxy-webctl/conf.py /etc/haproxy-api/conf.py
+chmod +x haproxy-webctl/haproxy-api
+cp haproxy-webctl/haproxy-api /etc/init.d/haproxy-api
+
+sed -i -e "s,'192.168.0.0/16',\"10.5.225.0/24\",g" /etc/haproxy-api/conf.py
+sed -i -e "s,daemon,daemon\n    stats socket /var/run/haproxy/haproxy.sock mode 0600 level admin,g" /etc/haproxy/haproxy.cfg
+
+update-rc.d -f haproxy-api defaults
+service haproxy-api restart
+

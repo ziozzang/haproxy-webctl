@@ -54,7 +54,9 @@ except:
   print "no configuration file found: %s" % CONF_FILE
   cfg = None
 
-if cfg is Not None:
+if cfg is None:
+  pass
+else:
   try:
     exec(cfg)
   except e:
